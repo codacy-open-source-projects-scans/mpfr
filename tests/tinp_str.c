@@ -20,7 +20,13 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.  If not, see
 https://www.gnu.org/licenses/ or write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301, USA. */
 
+#include <ctype.h>
+
 #include "mpfr-test.h"
+
+#ifdef HAVE_LOCALE_H
+#include <locale.h>
+#endif
 
 int
 main (int argc, char *argv[])
@@ -29,6 +35,13 @@ main (int argc, char *argv[])
   mpfr_t y;
   FILE *f;
   int i, n;
+
+  /* Since some needed characters like '-' and '.' may be whitespace
+     characters in non-"C" locales, do the test in the "C" locale
+     (this is the default). But the ISO C specification might change
+     as this would also be an issue for functions like strtod or
+     strtol (the latter is used by MPFR). */
+  tests_locale_enabled = 0;
 
   tests_start_mpfr ();
 
@@ -43,28 +56,29 @@ main (int argc, char *argv[])
       exit (1);
     }
   i = mpfr_inp_str (x, f, 10, MPFR_RNDN);
-  if (i == 0 || mpfr_cmp_si (x, -1700))
+  if (i != 5 || mpfr_cmp_si0 (x, -1700))
     {
       printf ("Error in reading 1st line from file inp_str.dat (%d)\n", i);
       mpfr_dump (x);
       exit (1);
     }
   i = mpfr_inp_str (x, f, 10, MPFR_RNDN);
-  if (i == 0 || mpfr_cmp_ui (x, 31415))
+  if (i != 10 || mpfr_cmp_ui0 (x, 31415))
     {
       printf ("Error in reading 2nd line from file inp_str.dat (%d)\n", i);
       mpfr_dump (x);
       exit (1);
     }
-  getc (f);
   i = mpfr_inp_str (x, f, 10, MPFR_RNDN);
-  if (i == 0 || mpfr_cmp_ui (x, 31416))
+  if (i != 111 || mpfr_cmp_ui0 (x, 31416))
     {
       printf ("Error in reading 3rd line from file inp_str.dat (%d)\n", i);
       mpfr_dump (x);
       exit (1);
     }
-  getc (f);
+  /* The 4th line is "12_this_is_an_invalid_float" (between the quotes).
+     Though the prefix 12 is a valid float, the full word is not, hence
+     the expected error. */
   i = mpfr_inp_str (x, f, 10, MPFR_RNDN);
   if (i != 0)
     {
@@ -79,7 +93,6 @@ main (int argc, char *argv[])
                 2, MPFR_RNDN);
   for (n = 2; n < 63; n++)
     {
-      getc (f);
       i = mpfr_inp_str (x, f, n, MPFR_RNDN);
       if (i == 0 || !mpfr_equal_p (x, y))
         {
@@ -89,6 +102,21 @@ main (int argc, char *argv[])
           exit (1);
         }
       mpfr_set_ui (x, 0, MPFR_RNDN);
+    }
+
+  /* In the "C" locale, isspace(0) is false. */
+  i = mpfr_inp_str (x, f, 10, MPFR_RNDN);
+  if (i != 0)
+    {
+      printf ("Error in the '\\0' test (%d)\n", i);
+      exit (1);
+    }
+  i = mpfr_inp_str (x, f, 10, MPFR_RNDN);
+  if (i != 3 || mpfr_cmp_ui0 (x, 17))
+    {
+      printf ("Error following the '\\0' test (%d)\n", i);
+      mpfr_dump (x);
+      exit (1);
     }
 
   fclose (f);
