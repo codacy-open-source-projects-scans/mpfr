@@ -729,10 +729,25 @@ You probably need to change some of the GMP or MPFR compile options.
 See 'config.log' for details (search for GMP_NUMB_BITS).])],
        [AC_MSG_RESULT([cannot test])])
 
+MPFR_CHECK_MP_LIMB_T_VS_LONG
+MPFR_CHECK_MP_LIMB_T_VS_INTMAX
+
+dnl Now we will need the GMP library (not just gmp.h).
+dnl Do not use AC_CHECK_LIB as it is based on a deprecated ISO C feature.
+LIBS="-lgmp $LIBS"
+
 dnl Check if we can link with GMP
-AC_CHECK_LIB(gmp, __gmpz_init, [LIBS="-lgmp $LIBS"],
- [AC_MSG_ERROR([libgmp not found or uses a different ABI (including static vs shared).
-Please read the INSTALL file -- see "In case of problem".])])
+AC_MSG_CHECKING(if we can link with GMP)
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include "gmp.h"
+mpz_t m;
+]],[[
+mpz_init (m);
+]])],[AC_MSG_RESULT(yes)],[
+ AC_MSG_RESULT(no)
+ AC_MSG_ERROR([libgmp not found or uses a different ABI (including static vs shared).
+Please read the INSTALL file -- see "In case of problem".])
+])
 
 dnl Check for corresponding 'gmp.h' and libgmp
 AC_MSG_CHECKING(if gmp.h version and libgmp version are the same)
@@ -808,9 +823,6 @@ dnl same for other GMP internal functions
 AC_CHECK_FUNCS([__gmpn_invert_limb])
 dnl mpn_rsblsh1_n(rp, up, vp, n) does {rp, n} <- 2 * {vp, n} - {up, n}
 AC_CHECK_FUNCS([__gmpn_rsblsh1_n])
-
-MPFR_CHECK_MP_LIMB_T_VS_LONG
-MPFR_CHECK_MP_LIMB_T_VS_INTMAX
 
 else
 
