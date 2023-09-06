@@ -5,7 +5,7 @@
 @c Note that the 5 occurrences of the version string in this file
 @c should be updated by the tools/update-version script.
 @set VERSION 4.3.0-dev
-@set UPDATED-MONTH August 2023
+@set UPDATED-MONTH September 2023
 @settitle GNU MPFR @value{VERSION}
 @synindex tp fn
 @iftex
@@ -3069,6 +3069,14 @@ outputting the value with a missing precision and reading it back will
 yield the original value.
 @item With @samp{f}, @samp{F}, @samp{g}, and @samp{G}, it is 6.
 @end itemize
+
+For a given number with @samp{a}/@samp{A}, 4 exponent values allow the
+first hexadecimal digit to be non-zero as required, and the choice is
+unspecified in ISO C99 and later. In MPFR, the choice currently depends
+on the value of the precision field (zero or non-zero) and on the input
+value. This may change in the future in order to have a more consistent
+behavior. Details and discussion:
+@url{https://sympa.inria.fr/sympa/arc/mpfr/2021-05/msg00002.html}
 
 @c For the record, concerning the choice for 'e'/'E':
 @c   https://sympa.inria.fr/sympa/arc/mpfr/2019-12/msg00000.html
