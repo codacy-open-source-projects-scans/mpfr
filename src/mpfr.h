@@ -525,7 +525,7 @@ __MPFR_DECLSPEC int mpfr_div_q (mpfr_ptr, mpfr_srcptr, mpq_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_add_q (mpfr_ptr, mpfr_srcptr, mpq_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_sub_q (mpfr_ptr, mpfr_srcptr, mpq_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_cmp_q (mpfr_srcptr, mpq_srcptr);
-__MPFR_DECLSPEC void mpfr_get_q (mpq_ptr q, mpfr_srcptr f);
+__MPFR_DECLSPEC void mpfr_get_q (mpq_ptr, mpfr_srcptr);
 #endif
 __MPFR_DECLSPEC int mpfr_set_str (mpfr_ptr, const char *, int, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_init_set_str (mpfr_ptr, const char *, int,
@@ -549,6 +549,9 @@ MPFR_EXTENSION
 __MPFR_DECLSPEC _Decimal128 mpfr_get_decimal128 (mpfr_srcptr, mpfr_rnd_t);
 #endif
 __MPFR_DECLSPEC long double mpfr_get_ld (mpfr_srcptr, mpfr_rnd_t);
+#ifndef _MPFR_NO_DEPRECATED_GET_D1 /* for the test of this function */
+MPFR_DEPRECATED
+#endif
 __MPFR_DECLSPEC double mpfr_get_d1 (mpfr_srcptr);
 __MPFR_DECLSPEC double mpfr_get_d_2exp (long*, mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC long double mpfr_get_ld_2exp (long*, mpfr_srcptr, mpfr_rnd_t);
@@ -558,7 +561,7 @@ __MPFR_DECLSPEC unsigned long mpfr_get_ui (mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC size_t mpfr_get_str_ndigits (int, mpfr_prec_t);
 __MPFR_DECLSPEC char * mpfr_get_str (char*, mpfr_exp_t*, int, size_t,
                                      mpfr_srcptr, mpfr_rnd_t);
-__MPFR_DECLSPEC int mpfr_get_z (mpz_ptr z, mpfr_srcptr f, mpfr_rnd_t);
+__MPFR_DECLSPEC int mpfr_get_z (mpz_ptr, mpfr_srcptr, mpfr_rnd_t);
 
 __MPFR_DECLSPEC void mpfr_free_str (char *);
 
@@ -716,7 +719,6 @@ __MPFR_DECLSPEC int mpfr_fits_sshort_p (mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_fits_uintmax_p (mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_fits_intmax_p (mpfr_srcptr, mpfr_rnd_t);
 
-__MPFR_DECLSPEC void mpfr_extract (mpz_ptr, mpfr_srcptr, unsigned int);
 __MPFR_DECLSPEC void mpfr_swap (mpfr_ptr, mpfr_ptr);
 __MPFR_DECLSPEC void mpfr_dump (mpfr_srcptr);
 
@@ -1225,7 +1227,7 @@ __MPFR_DECLSPEC int mpfr_fprintf (FILE*, const char*, ...);
 #endif
 #define mpfr_fpif_export __gmpfr_fpif_export
 #define mpfr_fpif_import __gmpfr_fpif_import
-__MPFR_DECLSPEC int mpfr_fpif_export (FILE*, mpfr_ptr);
+__MPFR_DECLSPEC int mpfr_fpif_export (FILE*, mpfr_srcptr);
 __MPFR_DECLSPEC int mpfr_fpif_import (mpfr_ptr, FILE*);
 
 #if defined (__cplusplus)

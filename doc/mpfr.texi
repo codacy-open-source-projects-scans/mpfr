@@ -5,7 +5,7 @@
 @c Note that the 5 occurrences of the version string in this file
 @c should be updated by the tools/update-version script.
 @set VERSION 4.3.0-dev
-@set UPDATED-MONTH February 2024
+@set UPDATED-MONTH June 2024
 @settitle GNU MPFR @value{VERSION}
 @synindex tp fn
 @iftex
@@ -1777,8 +1777,8 @@ See also @code{mpfr_fits_slong_p}, @code{mpfr_fits_ulong_p},
 @code{mpfr_fits_intmax_p} and @code{mpfr_fits_uintmax_p}.
 @end deftypefun
 
-@deftypefun double mpfr_get_d_2exp (long *@var{exp}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
-@deftypefunx {long double} mpfr_get_ld_2exp (long *@var{exp}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
+@deftypefun double mpfr_get_d_2exp (long int *@var{exp}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
+@deftypefunx {long double} mpfr_get_ld_2exp (long int *@var{exp}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
 Return @var{d} and set @var{exp}
 (formally, the value pointed to by @var{exp})
 such that @tm{0.5 @le{} @GMPabs{@var{d}} < 1}
@@ -2456,7 +2456,7 @@ Set @var{rop} to the cosine (resp.@: sine and tangent) of
 @code{mpfr_sinu}, @code{mpfr_cosu} and @code{mpfr_tanu} for special values.
 @end deftypefun
 
-@deftypefun int mpfr_sin_cos (mpfr_t @var{sop}, const mpfr_t @var{cop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
+@deftypefun int mpfr_sin_cos (mpfr_t @var{sop}, mpfr_t @var{cop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
 Set simultaneously @var{sop} to the sine of @var{op} and @var{cop} to the
 cosine of @var{op}, rounded in the direction @var{rnd} with the corresponding
 precisions of @var{sop} and @var{cop}, which must be different variables.
@@ -2561,7 +2561,7 @@ Set @var{rop} to the hyperbolic cosine, sine or tangent of @var{op},
 rounded in the direction @var{rnd}.
 @end deftypefun
 
-@deftypefun int mpfr_sinh_cosh (mpfr_t @var{sop}, const mpfr_t @var{cop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
+@deftypefun int mpfr_sinh_cosh (mpfr_t @var{sop}, mpfr_t @var{cop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
 Set simultaneously @var{sop} to the hyperbolic sine of @var{op} and
 @var{cop} to the hyperbolic cosine of @var{op},
 rounded in the direction @var{rnd} with the corresponding precision of
@@ -3100,7 +3100,7 @@ on POSIX systems). Note, however, that @code{errno} might be changed to
 another value by some internal library call if another error occurs there
 (currently, this would come from the unallocation function).
 
-@deftypefun int mpfr_fprintf (FILE *@var{stream}, const char *@var{template}, @dots{})
+@deftypefun int mpfr_fprintf (FILE *@var{stream}, const char *@var{template}, ...)
 @deftypefunx int mpfr_vfprintf (FILE *@var{stream}, const char *@var{template}, va_list @var{ap})
 Print to the stream @var{stream} the optional arguments under the control of
 the template string @var{template}.
@@ -3108,7 +3108,7 @@ Return the number of characters written or a negative value if an error
 occurred.
 @end deftypefun
 
-@deftypefun  int mpfr_printf (const char *@var{template}, @dots{})
+@deftypefun  int mpfr_printf (const char *@var{template}, ...)
 @deftypefunx int mpfr_vprintf (const char *@var{template}, va_list @var{ap})
 Print to @code{stdout} the optional arguments under the control of the
 template string @var{template}.
@@ -3116,7 +3116,7 @@ Return the number of characters written or a negative value if an error
 occurred.
 @end deftypefun
 
-@deftypefun int mpfr_sprintf (char *@var{buf}, const char *@var{template}, @dots{})
+@deftypefun int mpfr_sprintf (char *@var{buf}, const char *@var{template}, ...)
 @deftypefunx int mpfr_vsprintf (char *@var{buf}, const char *@var{template}, va_list @var{ap})
 Form a null-terminated array corresponding to the optional arguments under
 the control of the template string @var{template}, and print it in
@@ -3127,7 +3127,7 @@ Return the number of characters written in the array @var{buf}
 the terminating null character or a negative value if an error occurred.
 @end deftypefun
 
-@deftypefun int mpfr_snprintf (char *@var{buf}, size_t @var{n}, const char *@var{template}, @dots{})
+@deftypefun int mpfr_snprintf (char *@var{buf}, size_t @var{n}, const char *@var{template}, ...)
 @deftypefunx int mpfr_vsnprintf (char *@var{buf}, size_t @var{n}, const char *@var{template}, va_list @var{ap})
 Form a null-terminated array corresponding to the optional arguments under
 the control of the template string @var{template}, and print it in
@@ -3140,7 +3140,7 @@ sufficiently large, @emph{not counting}
 the terminating null character, or a negative value if an error occurred.
 @end deftypefun
 
-@deftypefun int mpfr_asprintf (char **@var{str}, const char *@var{template}, @dots{})
+@deftypefun int mpfr_asprintf (char **@var{str}, const char *@var{template}, ...)
 @deftypefunx int mpfr_vasprintf (char **@var{str}, const char *@var{template}, va_list @var{ap})
 Write their output as a null-terminated array in a block of memory allocated
 using the allocation function (@pxref{Memory Handling}). A pointer to the
@@ -3256,7 +3256,7 @@ When @var{op} is an integer or an infinity, set @var{rop} to zero with
 the same sign as @var{op}.
 @end deftypefun
 
-@deftypefun int mpfr_modf (mpfr_t @var{iop}, const mpfr_t @var{fop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
+@deftypefun int mpfr_modf (mpfr_t @var{iop}, mpfr_t @var{fop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
 Set simultaneously @var{iop} to the integral part of @var{op} and @var{fop} to
 the fractional part of @var{op}, rounded in the direction @var{rnd} with the
 corresponding precision of @var{iop} and @var{fop} (equivalent to
