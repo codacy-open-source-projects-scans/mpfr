@@ -1,7 +1,7 @@
 /* tfprintf.c -- test file for mpfr_fprintf and mpfr_vfprintf
 
-Copyright 2008-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2008-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -412,10 +412,12 @@ bug_20090316 (FILE *fout)
 static void
 check_null (FILE *fout)
 {
+#ifndef MPFR_TESTS_SKIP_CHECK_NULL
   int n;
 
   check_vfprintf (fout, ".%c%c.%n", 0, 1, &n);
   check_length (40, n, 4, d);
+#endif
 }
 
 int

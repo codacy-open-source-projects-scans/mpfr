@@ -1,7 +1,7 @@
 /* mpfr_cmp -- compare two floating-point numbers
 
-Copyright 1999, 2001, 2003-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999, 2001, 2003-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -25,6 +25,8 @@ If not, see <https://www.gnu.org/licenses/>. */
            a positive value iff b > sign(s) * c
            a negative value iff b < sign(s) * c
    returns 0 and sets erange flag if b and/or c is NaN.
+
+   b and c are allowed to be out of range.
 */
 
 MPFR_HOT_FUNCTION_ATTR int

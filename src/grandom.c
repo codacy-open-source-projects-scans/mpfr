@@ -3,8 +3,8 @@
    distribution and round it to the precision of rop1, rop2 according
    to the given rounding mode.
 
-Copyright 2011-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2011-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 

@@ -1,5 +1,5 @@
-# Copyright 2000-2024 Free Software Foundation, Inc.
-# Contributed by the AriC and Caramba projects, INRIA.
+# Copyright 2000-2025 Free Software Foundation, Inc.
+# Contributed by the Pascaline and Caramba projects, INRIA.
 
 # This file is part of the GNU MPFR Library.
 
@@ -73,7 +73,8 @@ random_deviate.h random_deviate.c erandom.c mpfr-mini-gmp.c             \
 mpfr-mini-gmp.h fmma.c log_ui.c gamma_inc.c ubf.c invert_limb.h         \
 invsqrt_limb.h beta.c odd_p.c get_q.c pool.c total_order.c set_d128.c   \
 get_d128.c nbits_ulong.c cmpabs_ui.c sinu.c cosu.c tanu.c fmod_ui.c     \
-acosu.c asinu.c atanu.c compound.c exp2m1.c exp10m1.c powr.c
+acosu.c asinu.c atanu.c compound.c exp2m1.c exp10m1.c powr.c trigamma.c \
+set_float16.c get_float16.c set_bfloat16.c get_bfloat16.c
 
 nodist_libmpfr_la_SOURCES = $(BUILT_SOURCES)
 

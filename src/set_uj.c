@@ -1,7 +1,7 @@
 /* mpfr_set_uj -- set a MPFR number from a huge machine unsigned integer
 
-Copyright 2004-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2004-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 

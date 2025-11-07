@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright 2016-2024 Free Software Foundation, Inc.
+# Copyright 2016-2025 Free Software Foundation, Inc.
 # This script is free software; the Free Software Foundation
 # gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
@@ -25,9 +25,9 @@ cat <<EOF
 [check-typography] Warning! Possibly incorrect typography.
 Make it explicit to avoid ambiguities:
   * Punctuation not ending a sentence: use @: after the punctuation
-    (Texinfo manual: Section 12.3.2 "Not Ending a Sentence").
+    (Texinfo manual: Section "Not Ending a Sentence").
   * Punctuation ending a sentence: use @ before the punctuation
-    (Texinfo manual: Section 12.3.3 "Ending a Sentence").
+    (Texinfo manual: Section "Ending a Sentence").
 Affected lines in mpfr.texi:
 $o
 [check-typography] End of the warning message.

@@ -4,8 +4,8 @@ dnl WARNING! C code starting with # (preprocessor directives) must not
 dnl be indented!
 
 AC_COPYRIGHT([
-Copyright 1999-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -276,7 +276,7 @@ AC_ARG_ENABLE(decimal-float,
 
 dnl Warning! Not to be confused with _Decimal128. Thus it is better
 dnl to say binary128 in the description. It can correspond to either
-dnl _Float128 (ISO/IEC TS 18661) or __float128 (old type name).
+dnl _Float128 (ISO C23) or __float128 (old type name).
 AC_ARG_ENABLE(float128,
    [  --disable-float128      explicitly disable binary128 support
   --enable-float128       build conversion functions from/to binary128

@@ -1,8 +1,8 @@
 /* mpfr_set_ui_2exp -- set a MPFR number from a machine unsigned integer with
    a shift
 
-Copyright 2004, 2006-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2004, 2006-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 

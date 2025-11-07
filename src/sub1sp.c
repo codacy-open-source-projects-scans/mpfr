@@ -1,8 +1,8 @@
 /* mpfr_sub1sp -- internal function to perform a "real" subtraction
    All the op must have the same precision
 
-Copyright 2003-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2003-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 

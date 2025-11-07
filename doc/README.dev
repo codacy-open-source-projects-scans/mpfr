@@ -1,5 +1,5 @@
-Copyright 2002-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2002-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -35,7 +35,10 @@ usual way (see the INSTALL file, but note that there are no patches to
 apply, and the URLs are not valid since the corresponding version has
 not been released yet).
 
-To generate mpfr.info, you need texinfo version 4.2 (or higher).
+To generate mpfr.info, you need GNU Texinfo version 4.2 (or higher).
+Note that old Texinfo versions are no longer tested (this is useless
+for releases, as the mpfr.info file is provided by the tarball). So
+the actual requirement might be stronger. Please report any issue.
 
 ===========================================================================
 
@@ -245,10 +248,10 @@ To make a release (for the MPFR team):
      Note: First, make sure that all the pending commits have been done.
      Push the changes with "git push".
 
-  5) Create an annotated tag whose name corresponds to the content of
+  5) Create a signed tag whose name corresponds to the content of
      the VERSION file:
        $ tag=$(cat VERSION)
-       $ git tag -m "GNU MPFR $tag tag." $tag
+       $ git tag -s -m "GNU MPFR $tag tag." $tag
      and push it:
        $ git push origin $tag
      Note: in case of error, see the git-tag(1) man page.
@@ -399,6 +402,12 @@ To make a release (for the MPFR team):
      --enable-debug-prediction, run "timings-mpfr 100", and check that
      the output contains no WARNING.
 
+     Also check that the build remains correct, including the documentation,
+     when MPFR is built under various locales (in particular, tr_TR.utf8),
+     at least with the default configuration (note that this is different
+     from checking the testsuite with different locales). A way to easily
+     check that is to ensure that the MPFR build is reproducible by default.
+
      For various platforms and compilers, check that:
        * [make check-gmp-symbols]
          MPFR does not use GMP internal symbols (unless --with-gmp-build
@@ -542,6 +551,10 @@ Note that emin(m68k) = emin(x86) - 1.
 
 + MPFR_WANT_FLOAT128:   Define to build conversion functions from/to
                         binary128 floats (_Float128 or __float128).
+                        Define it to 1 if constants have the f128 suffix.
+                        Define it to 2 if constants have the q suffix; in
+                        this case, the mpfr_float128 macro may have to be
+                        defined as __float128 (a.k.a. __float128 fallback).
 
 + MPFR_ALLOCA_MAX:      Maximum size for the use of alloca() by temporary
                         allocations (default: 16384); if set to 0, alloca()
@@ -618,6 +631,13 @@ List of macros used for checking MPFR:
                         with the MPFR_TESTS_TIMEOUT environment variable.
 + MPFR_TESTS_ABORT:     Define to replace exit(1) by abort(), thus with a
                         core dump.
++ MPFR_TESTS_SKIP_CHECK_NULL:
+                        Define to skip the check_null() tests in
+                        tfprintf.c and tsprintf.c, in case of failure
+                        due to a bug in GMP's vsnprintf replacement
+                        (see INSTALL file). The goal is just to avoid
+                        a failure of the MPFR testsuite; there is no
+                        workaround for the bug in GMP's vsnprintf!
 + MPFR_COV_CHECK:       Define to enable value coverage checking (must not
                         be used in production). This macro is for the MPFR
                         developers, in order to improve the test suite.
@@ -697,10 +717,10 @@ ISO C Names and corresponding headers:
   http://www.schweikhardt.net/identifiers.html
 
 The C language:
-  https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf (C99)
+  https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1256.pdf (C99 + TC3)
   https://www.open-std.org/jtc1/sc22/wg14/www/C99RationaleV5.10.pdf
   https://www.open-std.org/jtc1/sc22/wg14/www/docs/n1570.pdf (C11 draft)
-  https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3096.pdf (C2x draft)
+  https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3220.pdf (≈ C23)
   http://home.datacomm.ch/t_wolf/tw/c/c9x_changes.html
 
 About undefined behavior:
@@ -712,7 +732,17 @@ About undefined behavior:
   https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3128.pdf
 
 Type punning, strict aliasing, and optimization:
-  https://blog.regehr.org/archives/959
+  https://blog.regehr.org/archives/959 and the comments
+  (The union trick is actually valid.)
+
+N3519 "Understanding Effective Type Aliasing in C" by Eskil Steenberg:
+  https://www.open-std.org/jtc1/sc22/wg14/www/docs/n3519.pdf
+but "So my conclusion is: struct and union members have the effective type
+of the member." seems incorrect.
+
+Related to that, struct extension and inheritance:
+  https://stackoverflow.com/questions/63518693/struct-extension-in-c
+  https://www.codementor.io/@arpitbhayani/powering-inheritance-in-c-using-structure-composition-176sygr724
 
 To allow MPFR to be built on some buggy compiler, try to follow
 these rules:
@@ -739,10 +769,23 @@ with code like MPFR_EXP_MIN/n).
 
    =====================================================================
 
-Don't use "near" and "far" as variable names since they are "Keywords"
-for some C compiler (Old DOS compiler). Also don't use "pm", which is used
-by the C compiler 'sharp' to design variables that should be stored in the
-flash memory. Don't use "new", which is reserved in C++.
+Don't use the following identifiers since they are keywords for some
+compilers:
+  - "bool", "true" and "false": keywords in ISO C23.
+  - "near" and "far": keywords in some old DOS compiler.
+  - "pm", which is used by the C compiler 'sharp' to design variables
+    that should be stored in the flash memory.
+  - "new", which is reserved in C++.
+
+Note: This list is not exhaustive; these are just the simplest keywords,
+which are likely to be used by mistake.
+
+Do not use reserved identifiers that have an external definition, even
+if the associated headers is not included (see ISO C23 7.1.3p1). This
+comprises the functions from the C library (including the math library,
+if any). There does not seem to be an easy way to detect them; perhaps
+GCC will do that:
+  https://gcc.gnu.org/bugzilla/show_bug.cgi?id=51437
 
 Check C++ reserved keywords, e.g. from
 
@@ -839,13 +882,6 @@ does not conform to the C standard by default. References:
   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=85957
 
 [*] https://stackoverflow.com/questions/4331200/what-do-f-and-d-mean-at-the-end-of-numeric-literals
-
-   =====================================================================
-
-In MPFR, _Float128 may be defined as __float128 if the latter is provided
-by the compiler, but not the former. In such a case, do not assume that
-_Float128 and long double are necessarily different types (as required by
-the WG14 N2579 draft "IEC 60559 interchange and extended types").
 
    =====================================================================
 
@@ -979,6 +1015,30 @@ for undefined preprocessing identifier").
 
 ===========================================================================
 
+Make sure that if code may appear in a function or macro argument, any
+comma is inside parentheses (this must be parentheses, not brackets),
+so that the comma is not interpreted as separating arguments.
+
+For instance, do not write
+  bp[MPFR_ASSERTD (k >= 0), k]
+but
+  bp[(MPFR_ASSERTD (k >= 0), k)]
+because
+  MPFR_UNLIKELY (bp[MPFR_ASSERTD (k >= 0), k] == 0)
+would be invalid (it may also be better to put the assertion earlier
+to improve the readability of the code, if possible).
+
+This mainly concerns the MPFR_ASSERT* macros (which are likely to be
+followed by a comma operator) and macros that can take non-expression
+code (such as MPFR_RNDRAW_GEN and MPFR_FAST_COMPUTE_IF_SMALL_INPUT).
+
+A really misused comma should generally yield a compilation error,
+thus would easily be detected. But this might not be the case if the
+occurrence is in conditionally compiled code or if this is combined
+with some other mistake.
+
+===========================================================================
+
 If you want to use the logging of MPFR, you need to enable it:
   make distclean
   ./configure --enable-logging
@@ -1013,9 +1073,15 @@ MPFR_LOG_STAT:     Log how many times Ziv failed.
 MPFR_LOG_ALLOCA:   Log the alloca() amounts.
 MPFR_LOG_ALL:      Log everything
 
-Define them. Run your program, and view `mpfr.log`.
+Define them. Run your program, and view `mpfr.log` (default).
 
 For example, just define MPFR_LOG_ALL, run you program, and view `mpfr.log`.
+
+Security note: The default file name is "mpfr.log", thus relative to the
+current directory. Be careful if you do not have exclusive write access.
+Currently, the file is opened with fopen(...,"w") and it is not possible
+to use a different mode. Future MPFR versions might use security features
+by default if they become widely available (like NetBSD's "f" and "l").
 
 Note: The running time may be much longer. If logging is used on the
 test suite with a default timeout, it may be necessary to increase the
@@ -1028,46 +1094,29 @@ This feature is available only for gcc >= 3.0 and glibc >= 2.0.
 To achieve this, these macros have been added:
 
 +++ MPFR_LOG_VAR(y)
- Log a MPFR variable if requested (INTERNAL).
- Example:
-   mpfr_t y;
-   MPFR_LOG_VAR (y);
+Log a MPFR variable if requested (INTERNAL).
+Example:
+  mpfr_t y;
+  MPFR_LOG_VAR (y);
 
 +++ MPFR_LOG_MSG(x)
- Log another message (a warning for example)
+Log another message (a warning for example).
 Example:
- MPFR_LOG_MSG (("WARNING: Unchecked code\n", 0));
+  MPFR_LOG_MSG (("WARNING: Unchecked code\n", 0));
 The 0 is here a dummy value, because there must be at least an argument
 after the format string.
 
-+++ MPFR_LOG_BEGIN(x)
- Add this macro at the beginning of a function.
-Example:
- int dodo (mpfr_t x, mpfr_t op, int cnt, mpfr_rnd_t rnd) {
-  [decl]
-  MPFR_LOG_BEGIN (("op[%Pd]=%.*Rg rnd=%s",
-                    mpfr_get_prec(op), mpfr_log_prec, op, RND2STR(rnd)));
-
-+++ MPFR_LOG_END(x)
- Add this macro at the end of a function.
-Example:
- MPFR_LOG_END (("x[%Pd]=%.*Rg i=%d", mpfr_get_prec (x), mpfr_log_prec, x, i));
- return i;
-}
-
 +++ MPFR_LOG_FUNC (begin,end)
-  Add this macro at the beginning of a function. It does
-the same job as MPFR_LOG_BEGIN and MPFR_LOG_END but it is smatter
-since it intercepts the return itself to put the end statement.
-Example
- MPFR_LOG_FUNC (
+Add this macro at the beginning of a function. It logs the first message
+at the entry of the function and the second message just before the
+function returns.
+Example:
+  MPFR_LOG_FUNC (
     ("op[%Pd]=%.*Rg rnd=%d", op, mpfr_get_prec (op), mpfr_log_prec, op),
     ("x[%Pd]=%.*Rg inexact=%d", mpfr_get_prec (x), mpfr_log_prec, x, i));
 
-
-The double brackets "((" and "))" are needed since MPFR must still
-compile with non GNU compiler, so Macros with variable # of args
-are not allowed.
+The double brackets "((" and "))" are needed since MPFR must compile with
+old compiler, so macros with variable number of arguments are not allowed.
 
 It uses the extension of the mpfr_printf function: %Rf to display a mpfr_t.
 %Ru is used to display the precision of a mpfr_t.
@@ -1107,7 +1156,7 @@ mpfr_toto (mpfr_ptr rop, mpfr_srcptr op, mpfr_rnd_t rnd)
   MPFR_SAVE_EXPO_DECL (expo);
 
   /* Log it if requested */
-  MPFR_LOG_BEGIN
+  MPFR_LOG_FUNC
     (("op[%Pd]=%.*Rg rnd=%d", mpfr_get_prec (op), mpfr_log_prec, op, rnd),
      ("rop[%Pd]=%.*Rg inexact=%d",
        mpfr_get_prec (rop), mpfr_log_prec, rop, inexact));
@@ -1422,6 +1471,15 @@ More on exponent handling:
 
     printf ("%" MPFR_EXP_FSPEC "d", (mpfr_eexp_t) exponent);
 
+* In general, a regular MPFR number must have an exponent that is in the
+  current exponent range. But comparisons on MPFR numbers need to accept
+  inputs with out-of-range exponents, e.g. to be able to compare with
+  constants independently of the current exponent range. Some functions
+  or macros that are allowed to be used by low-level algorithms may accept
+  invalid exponent values: values less than MPFR_EMIN_MIN or larger than
+  MPFR_EMAX_MAX; but in contexts where singular values are possible, the
+  exponent value must obviously be larger than MPFR_EXP_INF.
+
 For implementation details, see the mpfr.h and mpfr-impl.h files.
 
 ===========================================================================
@@ -1592,8 +1650,8 @@ of the tests/Makefile.am file.
 
 /* Test file for mpfr_func.
 
-Copyright 2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -1700,6 +1758,12 @@ the tests/Makefile.am file.
 In case of failure of a test, freeing the memory explicitly before exiting
 is not necessary. We do this in case of success just to be able to detect
 memory leaks in MPFR.
+
+Error messages for incorrect results should be written to the standard output
+(stdout), except when it is redirected (e.g. in tprintf.c), in which case
+they must be written to the standard error (stderr). Error messages about
+errors unrelated to the MPFR library (e.g. failure to open a data file or
+detection of a compiler bug) must also be written to the standard error.
 
 Also, try to make sure that the tests run against previous MPFR versions,
 possibly by disabling some tests with code like

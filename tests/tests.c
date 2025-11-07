@@ -1,7 +1,7 @@
 /* Miscellaneous support for test programs.
 
-Copyright 2001-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2001-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -83,10 +83,12 @@ If not, see <https://www.gnu.org/licenses/>. */
  * Notes:
  *   + SSE2 (used to implement double's on x86_64, and possibly on x86
  *     too, depending on the compiler configuration and flags) is not
- *     affected by the dynamic precision.
- *   + When the FPU is set to single precision, the behavior of MPFR
- *     functions that have a native floating-point type (float, double,
- *     long double) as argument or return value is not guaranteed.
+ *     affected by the dynamic precision. However, it can be affected
+ *     by the flush-to-zero (FTZ) and denormals-are-zero (DAZ) flags
+ *     in the MXCSR register for subnormals.
+ *   + When the FPU does not have its usual configuration, the behavior
+ *     of MPFR functions that have a native floating-point type (float,
+ *     double, long double) as argument or return value is not guaranteed.
  */
 
 #include <fpu_control.h>

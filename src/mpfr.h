@@ -1,7 +1,7 @@
 /* mpfr.h -- Include file for mpfr.
 
-Copyright 1999-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -58,7 +58,7 @@ MPFR_VERSION_NUM(MPFR_VERSION_MAJOR,MPFR_VERSION_MINOR,MPFR_VERSION_PATCHLEVEL)
 /* TODO: MPFR_EXTENSION is used for
      - extensions to ISO C90 (see MPFR_DECL_INIT macro, valid in C99);
      - extensions to ISO C17 (declarations with _Decimal64, _Decimal128
-       and _Float128, which will be in ISO C23).
+       and _Float128 from ISO C23).
    Define 2 different macros MPFR_EXTENSION_C90 and MPFR_EXTENSION_C17
    in order to avoid __extension__ when the feature is standard in the
    chosen version (see __STDC_VERSION__)? */
@@ -235,7 +235,8 @@ typedef uintmax_t mpfr_uexp_t;
    The mpfr_sgn macro uses the fact that __MPFR_EXP_NAN and __MPFR_EXP_ZERO
    are the smallest values. For a n-bit type, EXP_MAX is 2^(n-1)-1,
    EXP_ZERO is 1-2^(n-1), EXP_NAN is 2-2^(n-1), EXP_INF is 3-2^(n-1).
-   This may change in the future. MPFR code should not be based on these
+   This might change in the future, but would break the ABI.
+   Source code using the MPFR library should not be based on these
    representations (but if this is absolutely needed, protect the code
    with a static assertion). */
 #define __MPFR_EXP_MAX ((mpfr_exp_t) (((mpfr_uexp_t) -1) >> 1))
@@ -406,6 +407,8 @@ __MPFR_DECLSPEC MPFR_RETURNS_NONNULL const char * mpfr_get_version (void);
 __MPFR_DECLSPEC MPFR_RETURNS_NONNULL const char * mpfr_get_patches (void);
 
 __MPFR_DECLSPEC int mpfr_buildopt_tls_p          (void);
+__MPFR_DECLSPEC int mpfr_buildopt_float16_p      (void);
+__MPFR_DECLSPEC int mpfr_buildopt_bfloat16_p      (void);
 __MPFR_DECLSPEC int mpfr_buildopt_float128_p     (void);
 __MPFR_DECLSPEC int mpfr_buildopt_decimal_p      (void);
 __MPFR_DECLSPEC int mpfr_buildopt_gmpinternals_p (void);
@@ -493,10 +496,28 @@ __MPFR_DECLSPEC int mpfr_set_decimal128 (mpfr_ptr, _Decimal128, mpfr_rnd_t);
 #endif
 __MPFR_DECLSPEC int mpfr_set_ld (mpfr_ptr, long double, mpfr_rnd_t);
 #ifdef MPFR_WANT_FLOAT128
+/* The user is free to define mpfr_float128 as another equivalent type,
+   such as __float128 if this one is supported by the current compiler
+   but _Float128 isn't. */
+# ifndef mpfr_float128
+#  define mpfr_float128 _Float128
+# endif
 MPFR_EXTENSION
-__MPFR_DECLSPEC int mpfr_set_float128 (mpfr_ptr, _Float128, mpfr_rnd_t);
+__MPFR_DECLSPEC int mpfr_set_float128 (mpfr_ptr, mpfr_float128, mpfr_rnd_t);
 MPFR_EXTENSION
-__MPFR_DECLSPEC _Float128 mpfr_get_float128 (mpfr_srcptr, mpfr_rnd_t);
+__MPFR_DECLSPEC mpfr_float128 mpfr_get_float128 (mpfr_srcptr, mpfr_rnd_t);
+#endif
+#ifdef MPFR_WANT_FLOAT16
+MPFR_EXTENSION
+__MPFR_DECLSPEC int mpfr_set_float16 (mpfr_ptr, _Float16, mpfr_rnd_t);
+MPFR_EXTENSION
+__MPFR_DECLSPEC _Float16 mpfr_get_float16 (mpfr_srcptr, mpfr_rnd_t);
+#endif
+#ifdef MPFR_WANT_BFLOAT16
+MPFR_EXTENSION
+__MPFR_DECLSPEC int mpfr_set_bfloat16 (mpfr_ptr, __bf16, mpfr_rnd_t);
+MPFR_EXTENSION
+__MPFR_DECLSPEC __bf16 mpfr_get_bfloat16 (mpfr_srcptr, mpfr_rnd_t);
 #endif
 __MPFR_DECLSPEC int mpfr_set_z (mpfr_ptr, mpz_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_set_z_2exp (mpfr_ptr, mpz_srcptr, mpfr_exp_t,
@@ -796,6 +817,7 @@ __MPFR_DECLSPEC int mpfr_beta (mpfr_ptr, mpfr_srcptr, mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_lngamma (mpfr_ptr, mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_lgamma (mpfr_ptr, int *, mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_digamma (mpfr_ptr, mpfr_srcptr, mpfr_rnd_t);
+__MPFR_DECLSPEC int mpfr_trigamma (mpfr_ptr, mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_zeta (mpfr_ptr, mpfr_srcptr, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_zeta_ui (mpfr_ptr, unsigned long, mpfr_rnd_t);
 __MPFR_DECLSPEC int mpfr_fac_ui (mpfr_ptr, unsigned long, mpfr_rnd_t);
@@ -857,6 +879,9 @@ __MPFR_DECLSPEC int mpfr_custom_get_kind (mpfr_srcptr);
 
 __MPFR_DECLSPEC int mpfr_total_order_p (mpfr_srcptr, mpfr_srcptr);
 
+__MPFR_DECLSPEC int mpfr_fpif_export_mem (unsigned char *, size_t, mpfr_srcptr);
+__MPFR_DECLSPEC int mpfr_fpif_import_mem (mpfr_ptr, unsigned char *, size_t);
+
 #if defined (__cplusplus)
 }
 #endif
@@ -873,13 +898,14 @@ __MPFR_DECLSPEC int mpfr_total_order_p (mpfr_srcptr, mpfr_srcptr);
   MPFR_EXTENSION mp_limb_t __gmpfr_local_tab_##_x[((_p)-1)/GMP_NUMB_BITS+1]; \
   MPFR_EXTENSION mpfr_t _x = {{(_p),1,__MPFR_EXP_NAN,__gmpfr_local_tab_##_x}}
 
+/* Macros with a variable number of arguments have been introduced in C99. */
 #if MPFR_USE_C99_FEATURE
-/* C99 & C11 version: functions with multiple inputs supported */
+/* C99+ version */
 #define mpfr_round_nearest_away(func, rop, ...)                         \
   (mpfr_round_nearest_away_begin(rop),                                  \
    mpfr_round_nearest_away_end((rop), func((rop), __VA_ARGS__, MPFR_RNDN)))
 #else
-/* C90 version: function with one input supported */
+/* C90 version */
 #define mpfr_round_nearest_away(func, rop, op)                          \
   (mpfr_round_nearest_away_begin(rop),                                  \
    mpfr_round_nearest_away_end((rop), func((rop), (op), MPFR_RNDN)))
@@ -1224,6 +1250,7 @@ __MPFR_DECLSPEC size_t mpfr_out_str (FILE*, int, size_t, mpfr_srcptr,
 #define mpfr_fprintf __gmpfr_fprintf
 __MPFR_DECLSPEC int mpfr_fprintf (FILE*, const char*, ...);
 #endif
+
 #define mpfr_fpif_export __gmpfr_fpif_export
 #define mpfr_fpif_import __gmpfr_fpif_import
 __MPFR_DECLSPEC int mpfr_fpif_export (FILE*, mpfr_srcptr);

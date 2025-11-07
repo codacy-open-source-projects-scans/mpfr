@@ -1,7 +1,7 @@
 /* mpfr_dot -- dot product of two array of numbers
 
-Copyright 2018-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2018-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 

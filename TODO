@@ -1,5 +1,5 @@
-Copyright 1999-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -116,8 +116,13 @@ Table of contents:
   (section 7.31.8, page 392):
   rsqrt (differs from mpfr_rec_sqrt in -0: mpfr_rec_sqrt gives +Inf whereas
          rsqrt gives -Inf)
-- a function to compute the hash of a floating-point number
-  (suggested by Patrick Pelissier)
+- a function to compute a non-cryptographic hash of a floating-point number
+  (suggested by Patrick Pelissier), e.g. for hash tables (the documentation
+  should say whether it is stable across different architectures, different
+  MPFR versions, different processes... as this is generally not useful in
+  such a context).
+  Suggestion: https://sympa.inria.fr/sympa/arc/mpfr/2018-03/msg00014.html
+  Discussion: https://sympa.inria.fr/sympa/arc/mpfr/2025-04/msg00000.html
 - implement new functions from the C++17 standard:
   https://en.cppreference.com/w/cpp/numeric/special_functions
   assoc_laguerre, assoc_legendre, comp_ellint_1, comp_ellint_2, comp_ellint_3,
@@ -627,7 +632,8 @@ Table of contents:
   to say "on systems that support it".
 
 - add generic bad cases for functions that don't have an inverse
-  function that is implemented (use a single Newton iteration).
+  function that is implemented (use a single Newton iteration, or
+  the secant method if the derivative is unknown or too complex).
 
 - add bad cases for the internal error bound (by using a dichotomy
   between a bad case for the correct rounding and some input value
@@ -823,3 +829,5 @@ Table of contents:
 
 - count_leading_zeros may be replaced by the corresponding function in
   <stdbit.h> (from ISO C23) in the future.
+
+- replace reserved and potentially reserved identifiers, such as exp.

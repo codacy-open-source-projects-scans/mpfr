@@ -393,6 +393,17 @@ err-if-output \
   --msg='Do not use the HAVE_SUBNORM_* macros (for the tests, use have_subnorm_*).' \
   -t "HAVE_SUBNORM_" grep HAVE_SUBNORM_ $srctests
 
+# To allow the __float128 fallback, use mpfr_float128 instead of _Float128.
+for file in $srctests
+do
+  perl -e 'undef $/; $_ = <>;
+           s:/\*.*?\*/::sg;
+           s:# *define +mpfr_float128 +_Float128::;
+           print' $file |
+    err-if-output --msg="Use mpfr_float128 instead of _Float128." \
+                  -t "_Float128 type" grep '_Float128'
+done
+
 # In general, one needs to include mpfr-impl.h (note that some platforms
 # such as MS Windows use a config.h, which is included by mpfr-impl.h).
 for file in $c_src
@@ -420,7 +431,10 @@ err-if-output --msg='Use mpn_sqr instead of mpn_mul_n.' "mpn mul/sqr" \
 
 # Detect a Ziv loop that does not use the MPFR_ZIV_* macros, which may
 # give a bug like the one in rec_sqrt.c, found and fixed in 2023-04.
-# This is a heuristic; it assumes GNU style with correct indentation.
+# This is a heuristic: a for/while loop containing mpfr_can_round or
+# mpfr_round_p (case insensitive) is assumed to be a Ziv loop; it also
+# assumes GNU style with correct indentation to detect the end of the
+# loop (as no real parsing is done).
 # This can be silenced by using MPFR_ZIV_NEXT in a comment in the loop.
 # A false positive may actually be a bad indentation, which should be
 # fixed anyway.
@@ -551,14 +565,6 @@ GFDL versions differ:
   mpfr.texi: $fdlv2
 EOF
 
-err-if-output "ck-copyright-notice" tools/ck-copyright-notice
-
-if which gcc > /dev/null 2> /dev/null; then
-  err-if-output "ck-mparam" tools/ck-mparam
-else
-  echo "Warning! gcc is not installed. Cannot run ck-mparam." >&2
-fi
-
 # Note about the TZ value: GMT0 and UTC0 are both specified by POSIX,
 # and UTC0 is the preferred value, but old systems only accept GMT0.
 # The "0" is important ("GMT" alone does not work on Tru64 Unix).
@@ -643,9 +649,16 @@ err-if-output --msg='Say "positive infinity" and "negative infinity".' -t \
 err-if-output --msg='Say "same as".' -t \
   "same than" grep -Eir "same +(\w+ +)?than" $files
 
-err-if-output "ck-clz_tab" tools/ck-clz_tab
+# Run various check tools (some of them are also run by
+# "make dist" / "make distcheck"; see dist-hook in Makefile.am).
+# doc/check-typography is run earlier, to group it with other doc tests.
 err-if-output "ck-inits-clears" tools/ck-inits-clears
 err-if-output "ck-version-info" tools/ck-version-info
+err-if-output "ck-copyright-notice" tools/ck-copyright-notice
+err-if-output "ck-news" tools/ck-news
+err-if-output "ck-proto" tools/ck-proto
+err-if-output "ck-clz_tab" tools/ck-clz_tab
+err-if-output "ck-mparam" tools/ck-mparam
 
 ############################################################################
 

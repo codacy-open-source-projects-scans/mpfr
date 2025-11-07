@@ -1,8 +1,8 @@
 /* tbuildopt.c -- test file for mpfr_buildopt_tls_p and
    mpfr_buildopt_decimal_p.
 
-Copyright 2009-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2009-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -53,6 +53,24 @@ check_decimal_p (void)
   if (mpfr_buildopt_decimal_p())
     {
       printf ("Error: mpfr_buildopt_decimal_p should return false\n");
+      exit (1);
+    }
+#endif
+}
+
+static void
+check_float16_p (void)
+{
+#ifdef MPFR_WANT_FLOAT16
+  if (!mpfr_buildopt_float16_p())
+    {
+      printf ("Error: mpfr_buildopt_float16_p should return true\n");
+      exit (1);
+    }
+#else
+  if (mpfr_buildopt_float16_p())
+    {
+      printf ("Error: mpfr_buildopt_float16_p should return false\n");
       exit (1);
     }
 #endif
@@ -119,6 +137,7 @@ main (void)
 
   check_tls_p();
   check_decimal_p();
+  check_float16_p();
   check_float128_p();
   check_gmpinternals_p();
   check_sharedcache_p ();

@@ -1,7 +1,7 @@
 /* Exception flags and utilities. Constructors and destructors (debug).
 
-Copyright 2001-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2001-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -248,9 +248,10 @@ mpfr_set_erangeflag (void)
 
 #undef mpfr_check_range
 
-/* Note: It is possible that for pure FP numbers, EXP(x) < MPFR_EMIN_MIN,
-   but the caller must make sure that the difference remains small enough
-   to avoid reaching the special exponent values. */
+/* Note: Due to low-level algorithms, it is allowed that for pure FP numbers,
+   EXP(x) < MPFR_EMIN_MIN, but the caller must make sure that the difference
+   remains small enough to avoid reaching the special exponent values. So we
+   must not use MPFR_GET_EXP on x. */
 /* This function does not have logging messages. As it is also partly
    implemented as a macro, if messages are added in the future, the macro
    may need to be disabled when logging is enabled. */
@@ -303,10 +304,26 @@ mpfr_check_range (mpfr_ptr x, int t, mpfr_rnd_t rnd_mode)
        * So, the simplest solution is to detect this overflow case here in
        * mpfr_check_range, which is easy to do since the rounded result is
        * necessarily an inexact infinity.
+       * An underflow/overflow detection in the Ziv loop is assumed to be
+       * handled correctly, e.g. by calling mpfr_underflow/mpfr_overflow;
+       * in debug builds, we detect a potential issue with MPFR_ASSERTD:
+       * if the rounding mode is like MPFR_RNDZ, then an inexact infinity
+       * is not possible.
        */
+      MPFR_ASSERTD (! MPFR_IS_LIKE_RNDZ (rnd_mode, MPFR_IS_NEG(x)));
       __gmpfr_flags |= MPFR_FLAGS_OVERFLOW;
     }
   MPFR_RET (t);  /* propagate inexact ternary value, unlike most functions */
+  /* Note that MPFR_RET() on non-zero sets the inexact flag as required,
+     because MPFR_SAVE_EXPO_FREE() may unset it.
+     FIXME: Should we also ensure that the underflow flag is set when the
+     result is an inexact zero? If an inexact zero is possible without an
+     explicit underflow detection that sets the underflow flag in the code,
+     one could end up with an unset underflow flag, which is incorrect.
+     However, note that a representable intermediate value may round to
+     infinity, while it cannot round to 0 (the exponent would necessarily
+     be less than emin); so, the check of an inexact zero would be less
+     useful. In any case, we would need clarification in the manual. */
 }
 
 

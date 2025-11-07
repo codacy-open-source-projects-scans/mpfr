@@ -1,7 +1,7 @@
 /* MPFR internal constant FP numbers
 
-Copyright 2005-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2005-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -20,6 +20,10 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.
 If not, see <https://www.gnu.org/licenses/>. */
 
 #include "mpfr-impl.h"
+
+/* Warning! These constants may be out of range if the exponent range is
+   very reduced. Do not use them in such a case, except when explicitly
+   allowed (e.g., see comments in cmp.c, cmpabs.c and comparisons.c). */
 
 static const mp_limb_t __gmpfr_limb1[1] = {MPFR_LIMB_HIGHBIT};
 const mpfr_t __gmpfr_one = {{2, MPFR_SIGN_POS, 1, (mp_limb_t*)__gmpfr_limb1}};

@@ -1,7 +1,7 @@
 /* comparison predicates
 
-Copyright 2002-2004, 2006-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2002-2004, 2006-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -32,6 +32,8 @@ If not, see <https://www.gnu.org/licenses/>. */
  * mpfr_lessgreater_p       0     1     1     0
  * mpfr_equal_p             1     0     0     0
  * mpfr_unordered_p         0     0     0     1
+ *
+ * x and y are allowed to be out of range.
  */
 
 int

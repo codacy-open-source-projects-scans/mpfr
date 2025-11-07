@@ -1,8 +1,8 @@
 /* buildopt.c -- functions giving information about options used during the
    mpfr library compilation
 
-Copyright 2009-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2009-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -31,6 +31,27 @@ mpfr_buildopt_tls_p (void)
   return 0;
 #endif
 }
+
+int
+mpfr_buildopt_float16_p (void)
+{
+#ifdef MPFR_WANT_FLOAT16
+  return 1;
+#else
+  return 0;
+#endif
+}
+
+int
+mpfr_buildopt_bfloat16_p (void)
+{
+#ifdef MPFR_WANT_BFLOAT16
+  return 1;
+#else
+  return 0;
+#endif
+}
+
 
 int
 mpfr_buildopt_float128_p (void)

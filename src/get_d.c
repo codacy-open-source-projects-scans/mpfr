@@ -1,8 +1,8 @@
 /* mpfr_get_d, mpfr_get_d_2exp -- convert a multiple precision floating-point
                                   number to a machine double precision float
 
-Copyright 1999-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 1999-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
@@ -67,7 +67,7 @@ mpfr_get_d (mpfr_srcptr src, mpfr_rnd_t rnd_mode)
     {
       /* Note: Avoid using a constant expression DBL_MIN * DBL_EPSILON
          as this gives 0 instead of the correct result with gcc on some
-         Alpha machines. */
+         Alpha machines and possibly with flush-to-zero (FTZ). */
       d = negative ?
         (rnd_mode == MPFR_RNDD ||
          (rnd_mode == MPFR_RNDN && mpfr_cmp_si_2exp(src, -1, -1075) < 0)

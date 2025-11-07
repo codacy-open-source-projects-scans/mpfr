@@ -1,8 +1,8 @@
 /* mpfr_asinu  -- asinu(x) = asin(x)*u/(2*pi)
    mpfr_asinpi -- asinpi(x) = asin(x)/pi
 
-Copyright 2021-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2021-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 

@@ -23,8 +23,8 @@ the faq.html file on the MPFR web site. See the update-faq script.
 <xsl:template match="/">
   <xsl:text>&#10;</xsl:text>
   <xsl:comment>
-Copyright 2000-2024 Free Software Foundation, Inc.
-Contributed by the AriC and Caramba projects, INRIA.
+Copyright 2000-2025 Free Software Foundation, Inc.
+Contributed by the Pascaline and Caramba projects, INRIA.
 
 This file is part of the GNU MPFR Library.
 
