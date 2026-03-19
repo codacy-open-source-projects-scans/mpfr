@@ -262,8 +262,7 @@ Table of contents:
     where the derivative can be bounded by piecewise simple functions,
     something like min(1, 1/t) when t >= 0.
     See https://arxiv.org/abs/1705.03266 for rigorous error bounds.
-  + Trigamma Function psi'(x).
-    and Polygamma Function: psi^{(m)}(x) for m >= 0, x > 0.
+  + Polygamma Function: psi^{(m)}(x) for m >= 0, x > 0.
 - functions from ISO/IEC 24747:2009 (Extensions to the C Library,
   to Support Mathematical Special Functions).
   Standard: https://www.iso.org/standard/38857.html
@@ -289,6 +288,9 @@ Table of contents:
   functions. For example mpfr_frac_floor(x) = x - floor(x). (The current
   mpfr_frac function corresponds to mpfr_rint_trunc.)
 - scaled erfc (https://sympa.inria.fr/sympa/arc/mpfr/2009-05/msg00054.html)
+- scaled incomplete Gamma functions g(a,x) and G(a,x), see p. 561 of
+  "The Mathematical Function Handbook" by Nelson Beebe
+- psiln(x) = psi(x) - ln(x), p. 537 of "The Mathematical Function Handbook"
 - asec, acsc, acot, asech, acsch and acoth (mail from Björn Terelius on mpfr
   list, 18 June 2009)
 
