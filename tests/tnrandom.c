@@ -20,7 +20,6 @@ along with the GNU MPFR Library; see the file COPYING.LESSER.
 If not, see <https://www.gnu.org/licenses/>. */
 
 #include "mpfr-test.h"
-#include <math.h>
 
 /* The number of variants of nrandom */
 #define NRANDOM_VERSIONS 2
