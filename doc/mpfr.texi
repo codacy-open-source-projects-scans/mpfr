@@ -3643,6 +3643,8 @@ different (and the state of the random generator is different too).
 @end deftypefun
 
 @deftypefun int mpfr_nrandom (mpfr_t @var{rop1}, gmp_randstate_t @var{state}, mpfr_rnd_t @var{rnd})
+@deftypefunx int mpfr_nrandom_v1 (mpfr_t @var{rop1}, gmp_randstate_t @var{state}, mpfr_rnd_t @var{rnd})
+@deftypefunx int mpfr_nrandom_v2 (mpfr_t @var{rop1}, gmp_randstate_t @var{state}, mpfr_rnd_t @var{rnd})
 @deftypefunx int mpfr_grandom (mpfr_t @var{rop1}, mpfr_t @var{rop2}, gmp_randstate_t @var{state}, mpfr_rnd_t @var{rnd})
 Generate one (possibly two for @code{mpfr_grandom}) random floating-point
 number according to a standard normal Gaussian distribution (with mean zero
@@ -3666,9 +3668,19 @@ result). Otherwise the ternary value of a random number is always non-zero.
 Note: the note for @code{mpfr_urandomb} holds too. In addition, the exponent
 range and the rounding mode might have a side effect on the next random state.
 
-Note: @code{mpfr_nrandom} is much more efficient than @code{mpfr_grandom},
-especially for large precision. Thus @code{mpfr_grandom} is marked as
-deprecated and will be removed in a future release.
+Note: @code{mpfr_nrandom_v1} and @code{mpfr_nrandom_v2} use the same underlying
+algorithm with the latter being a more efficient implementation, particularly
+for low precisions.  These should be used if reproducible results are required
+across different versions of MPFR.  @code{mpfr_nrandom_v1} was
+called @code{mpfr_nrandom} before MPFR@tie{}4.3.
+Now @code{mpfr_nrandom} is a convenience function
+which calls @code{mpfr_nrandom_v1} (for backward compatibility).  In a future
+version, @code{mpfr_nrandom} will switch to invoking @code{mpfr_nrandom_v2}.
+
+Note: @code{mpfr_nrandom_v1} and @code{mpfr_nrandom_v2} are much more efficient
+than @code{mpfr_grandom}, especially for large precision. Thus
+@code{mpfr_grandom} is marked as deprecated and will be removed in a future
+release.
 @end deftypefun
 
 @deftypefun int mpfr_erandom (mpfr_t @var{rop1}, gmp_randstate_t @var{state}, mpfr_rnd_t @var{rnd})
@@ -4615,6 +4627,8 @@ use @code{mpfr_get_z_exp}.
 
 @item @code{mpfr_nrandom} in MPFR@tie{}4.0.
 
+@item @code{mpfr_nrandom_v1} and @code{mpfr_nrandom_v2} in MPFR@tie{}4.3.
+
 @item @code{mpfr_powr}, @code{mpfr_pown}, @code{mpfr_pow_sj} and @code{mpfr_pow_uj} in MPFR@tie{}4.2.
 
 @item @code{mpfr_printf} in MPFR@tie{}2.4.
@@ -4769,6 +4783,11 @@ compatibility reasons.
 
 @item @code{mpfr_lgamma} changed in MPFR@tie{}4.3.
 The @var{signp} argument can now be a null pointer.
+
+@item @code{mpfr_nrandom} changed in MPFR@tie{}4.3.
+This was changed to call @code{mpfr_nrandom_v1} and produces the same result
+as previously.  However, in the future it will call @code{mpfr_nrandom_v2},
+which is more efficient.
 
 @item @code{mpfr_out_str} changed in MPFR@tie{}4.1.
 The argument @var{base} can now be negative (from @minus{}2 to
@@ -4974,7 +4993,7 @@ Jean-Luc R@'emy contributed the @code{mpfr_zeta} code.
 Fabrice Rouillier contributed the @code{mpfr_xxx_z} and @code{mpfr_xxx_q}
 functions, and helped to the Microsoft Windows porting.
 Damien Stehl@'e contributed the @code{mpfr_get_ld_2exp} function.
-Charles Karney contributed the @code{mpfr_nrandom} and @code{mpfr_erandom}
+Charles Karney contributed the @code{mpfr_nrandom*} and @code{mpfr_erandom}
 functions.
 
 We would like to thank Jean-Michel Muller and Joris van der Hoeven for very
