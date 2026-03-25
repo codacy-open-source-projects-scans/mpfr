@@ -3671,7 +3671,7 @@ range and the rounding mode might have a side effect on the next random state.
 Note: @code{mpfr_nrandom_v1} and @code{mpfr_nrandom_v2} use the same underlying
 algorithm with the latter being a more efficient implementation, particularly
 for low precisions.  These should be used if reproducible results are required
-across different versions of MPFR.  @code{mpfr_nrandom_v1} was
+across different versions of MPFR@.  @code{mpfr_nrandom_v1} was
 called @code{mpfr_nrandom} before MPFR@tie{}4.3.
 Now @code{mpfr_nrandom} is a convenience function
 which calls @code{mpfr_nrandom_v1} (for backward compatibility).  In a future
