@@ -494,20 +494,31 @@ Particular configure values used by MPFR:
                         with the addition of $MPFR_EXTRA_CFLAGS.
 
 Compiler options should normally put in CFLAGS, as the goal of configure
-is to test under conditions similar to the actual build. This is the case
-of -Werror, if used, because it may have an influence on which features
-are supported: the implementation of some features may cause warnings,
-which are turned into errors.
+is to test under conditions similar to the actual build, in particular
+for the test of supported features. This is the case of -Werror, if
+used, because it may have an influence on which features are supported:
+the implementation of some features may cause warnings, which are turned
+into errors. All options about optional features should be put in CFLAGS.
 
-Options related to code analysis, such as GCC's -fanalyzer, should be put
-in MPFR_EXTRA_CFLAGS if -Werror is used, because various configure tests
-do not care about the execution: for instance, an infinite loop should not
-yield compile-time errors in configure (such a loop is used by the tests
-from Autoconf to check the support of _Noreturn).
+However, some particular options, which are just intended to detect bugs
+or poorly written code in MPFR, may need to be put in MPFR_EXTRA_CFLAGS
+when they are used together with -Werror, because they may yield failures
+on completely valid C code (for this reason, various configure tests may
+use such code, even though the compiler could complain). Such options fall
+into two classes:
+  * Code analysis, e.g. GCC's -fanalyzer. Even though running the code
+    could yield undefined behavior, various configure tests do not care
+    about the execution; for instance, an infinite loop should not yield
+    compile-time errors in configure (such a loop is used by the tests
+    from Autoconf to check the support of _Noreturn).
+  * Coding style (which could be regarded as bugs when using a recent
+    C standard), e.g. GCC's -Wold-style-declaration, which may yield a
+    clash between some standard Autoconf tests and GCC:
+      https://gcc.gnu.org/bugzilla/show_bug.cgi?id=108700
 
-The -Wall option may enable options related to code analysis, but it should
-normally be put in CFLAGS. The configure tests from Autoconf have improved
-to avoid failures.
+The -Wall option may enable options related to code analysis and coding
+style, but it should normally be put in CFLAGS. The configure tests from
+Autoconf have improved to avoid failures with options enabled by -Wall.
 
 ===========================================================================
 
