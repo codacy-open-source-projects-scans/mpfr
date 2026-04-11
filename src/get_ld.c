@@ -230,14 +230,41 @@ mpfr_get_ld (mpfr_srcptr x, mpfr_rnd_t rnd_mode)
           long double m;
           mpfr_exp_t sh; /* exponent shift -> x/2^sh is in the double range */
           mpfr_t y, z;
-          int sign;
+          int sign = MPFR_SIGN (x);
+          mpfr_prec_t prec = MPFR_LDBL_MANT_DIG; /* rounding precision */
+
+#if defined(HAVE_LDOUBLE_IEEE_QUAD_BIG) || defined(HAVE_LDOUBLE_IEEE_QUAD_LITTLE)
+          /* FIXME: Fix the special cases by avoiding MPFR_SAVE_EXPO_MARK
+             and get rid of "goto do_shift;" too (one can return
+             6.47517511943802511092443895822764655e-4966L directly,
+             which is __LDBL_DENORM_MIN__ with GCC).
+             Add tests to check every case for e <= 0. */
+          /* e is the exponent of the value of x divided by the
+             smallest subnormal 2^(-16494). Thus it should be the
+             rounding precision for subnormal results. */
+          mpfr_exp_t e = MPFR_GET_EXP (x) - (-16494);
+          if (e <= 0)
+            {
+              /* x is smaller than the smallest subnormal. */
+              if (MPFR_IS_LIKE_RNDZ (rnd_mode, sign < 0) ||
+                  (rnd_mode == MPFR_RNDN &&
+                   (e < 0 || mpfr_powerof2_raw (x))))
+                return sign < 0 ? -0.0 : 0.0;
+              r = 1.0;
+              sh = -16494;
+              goto do_shift;
+            }
+          /* prec = e >= 1 below */
+          if (e < prec)
+            prec = e;
+#endif
 
           /* First round x to the target long double precision, so that
              all subsequent operations are exact (this avoids double rounding
              problems). However, if the format contains numbers that have
              more precision, MPFR won't be able to generate such numbers. */
-          mpfr_init2 (y, MPFR_LDBL_MANT_DIG);
-          mpfr_init2 (z, MPFR_LDBL_MANT_DIG);
+          mpfr_init2 (y, prec);
+          mpfr_init2 (z, prec);
           /* Note about the precision of z: even though IEEE_DBL_MANT_DIG is
              sufficient, z has been set to the same precision as y so that
              the mpfr_sub below calls mpfr_sub1sp, which is faster than the
@@ -248,7 +275,6 @@ mpfr_get_ld (mpfr_srcptr x, mpfr_rnd_t rnd_mode)
 
           mpfr_set (y, x, rnd_mode);
           sh = MPFR_GET_EXP (y);
-          sign = MPFR_SIGN (y);
           MPFR_SET_EXP (y, 0);
           MPFR_SET_POS (y);
 
@@ -265,6 +291,7 @@ mpfr_get_ld (mpfr_srcptr x, mpfr_rnd_t rnd_mode)
           mpfr_clear (z);
           mpfr_clear (y);
 
+        do_shift:
           /* we now have to multiply back by 2^sh */
           MPFR_ASSERTD (r > 0);
           if (sh != 0)

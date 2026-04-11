@@ -523,21 +523,20 @@ bug_20160907 (void)
 static void
 bug20260409 (void)
 {
-#if defined(MPFR_WANT_FLOAT128) &&              \
-  (defined(HAVE_LDOUBLE_IEEE_QUAD_BIG) ||       \
-   defined(HAVE_LDOUBLE_IEEE_QUAD_LITTLE))
-  char *s = "-0.10001011100111111110000110110101100111001011100001101101001000001011001101011110110000000100110001110001110000010110011001111110e-16382";
+#if defined(HAVE_LDOUBLE_IEEE_QUAD_BIG) || defined(HAVE_LDOUBLE_IEEE_QUAD_LITTLE)
+  const char *s = "-0.10001011100111111110000110110101100111001011100001101101001000001011001101011110110000000100110001110001110000010110011001111110e-16382";
   mpfr_t op, expected;
   long double x;
 
   mpfr_init2 (op, 128);
   mpfr_init2 (expected, 128);
+
   mpfr_strtofr (op, s, NULL, 2, MPFR_RNDN);
   x = mpfr_get_ld (op, MPFR_RNDN);
   mpfr_strtofr (expected, "-0x2.2e7f86d672e1b482cd7b0131c704p-16384", NULL,
                 16, MPFR_RNDN);
   mpfr_set_ld (op, x, MPFR_RNDN);
-  if (mpfr_cmp (op, expected))
+  if (! mpfr_equal_p (op, expected))
     {
       printf ("Error in bug20260409:\n");
       printf ("mpfr_set_ld yields ");
@@ -546,6 +545,10 @@ bug20260409 (void)
       mpfr_dump (expected);
       exit (1);
     }
+
+  mpfr_set_si_2exp (op, 1, -16495, MPFR_RNDN);
+  x = mpfr_get_ld (op, MPFR_RNDN);
+
   mpfr_clear (op);
   mpfr_clear (expected);
 #endif
