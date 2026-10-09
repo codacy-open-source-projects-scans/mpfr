@@ -129,8 +129,7 @@ Table of contents:
   https://en.cppreference.com/w/cpp/numeric/special_functions
   assoc_laguerre, assoc_legendre, comp_ellint_1, comp_ellint_2, comp_ellint_3,
   cyl_bessel_i, cyl_bessel_j, cyl_bessel_k, cyl_neumann, ellint_1, ellint_2,
-  ellint_3, hermite, legendre, laguerre, sph_bessel, sph_legendre,
-  sph_neumann.
+  ellint_3, hermite, laguerre, sph_bessel, sph_legendre, sph_neumann.
   Already in mpfr4: beta and riemann_zeta.
   See also https://isocpp.org/files/papers/P0226R1.pdf and §29.9.5 in the
   C++17 draft:
@@ -204,7 +203,7 @@ Table of contents:
      classical Bessel Functions, also noted j0, j1, jn, y0, y1, yn in C99
      and mpfr.
      Cf https://en.wikipedia.org/wiki/Bessel_function#Spherical_Bessel_functions
-   *Irregular Spherical Bessel Functions y_n: y_0(x) = -\cos(x)/x,
+   * Irregular Spherical Bessel Functions y_n: y_0(x) = -\cos(x)/x,
      y_1(x)= -(\cos(x)/x+\sin(x))/x &
      y_2(x)= (-3/x^3+1/x)\cos(x)-(3/x^2)\sin(x)
    * Regular Modified Spherical Bessel Functions i_n:
@@ -759,6 +758,21 @@ Table of contents:
   Since -Werror must be kept for the configure tests so that features
   that do not work with it are disabled at configure time, we need to
   disable -fanalyzer for the configure tests.
+
+- add the ".DELETE_ON_ERROR:" special target to the Makefiles?
+  For instance, src/Makefile.am has
+    $(GET_PATCHES_SH) $(PATCHES) > $@ || { rm -f $@; exit 1; }
+  The "|| ..." is correct, but removing a partially updated target on
+  recipe failure is generally what is wanted, and this could be handled
+  globally with the ".DELETE_ON_ERROR:" special target, thus without the
+  risk of forgetting some recipes. This is what is recommended by the
+  GNU Make manual. But first, check the portability and whether there
+  could be any drawback.
+
+- design a way to test with lower initial working precisions in order to
+  find mistakes in error bounds with failures triggered by the testsuite.
+  Example: commit 1687639364f15c5e8f00ff1be564071e22ee65f0 in the
+  factorial branch.
 
 
 ##############################################################################

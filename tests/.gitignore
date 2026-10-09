@@ -108,6 +108,7 @@
 /tget_z
 /tgmpop
 /tgrandom
+/thermite
 /thyperbolic
 /thypot
 /tinits
@@ -119,6 +120,7 @@
 /tj1
 /tjn
 /tl2b
+/tlegendre
 /tlgamma
 /tli2
 /tlngamma

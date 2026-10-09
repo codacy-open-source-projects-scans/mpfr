@@ -6,7 +6,7 @@
 @c Note that the 5 occurrences of the version string in this file
 @c should be updated by the tools/update-version script.
 @set VERSION 4.3.0-dev
-@set UPDATED-MONTH March 2026
+@set UPDATED-MONTH October 2026
 @settitle GNU MPFR @value{VERSION}
 @synindex tp fn
 @iftex
@@ -1143,6 +1143,8 @@ An exact infinite result is obtained from finite inputs.
 
 @item NaN (@code{MPFR_FLAGS_NAN}):
 A NaN exception occurs when the result of a function is NaN@.
+Note this does not exactly match the invalid exception from the C language,
+this is why we choose a different name.
 @c NaN is defined above. So, we don't say anything more.
 
 @item Inexact (@code{MPFR_FLAGS_INEXACT}):
@@ -2091,13 +2093,14 @@ Set @var{rop} to NaN if @var{op} is negative.
 @end deftypefun
 
 @deftypefun int mpfr_rec_sqrt (mpfr_t @var{rop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
+@deftypefunx int mpfr_rsqrt (mpfr_t @var{rop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
 Set @var{rop} to @m{1/\sqrt{@var{op}}, the reciprocal square root of @var{op}}
-rounded in the direction @var{rnd}.  Set @var{rop} to @mm{+}Inf if @var{op} is
+rounded in the direction @var{rnd}.  The function @code{mpfr_rec_sqrt},
+which is equivalent to @code{mpfr_rootn_si} with @tm{@var{n} = @minus{}2},
+sets @var{rop} to @mm{+}Inf if @var{op} is
 @pom{}0, @mm{+}0 if @var{op} is @mm{+}Inf, and NaN if @var{op} is negative.
-Warning!  Therefore the result on @minus{}0 is different from the one of the
-rSqrt function recommended by the IEEE@tie{}754 standard (Section@tie{}9.2.1),
-which is @minus{}Inf instead of @mm{+}Inf. However, @code{mpfr_rec_sqrt} is
-equivalent to @code{mpfr_rootn_si} with @tm{@var{n} = @minus{}2}.
+The function @code{mpfr_rsqrt} only differs for @minus{}0, where it returns
+@minus{}Inf instead, following the IEEE@tie{}754 standard (Section@tie{}9.2.1).
 @end deftypefun
 
 @deftypefun int mpfr_cbrt (mpfr_t @var{rop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
@@ -2228,6 +2231,27 @@ correctly rounded in the direction @var{rnd}. Warning: for efficiency reasons,
 @var{a} and @var{b} are arrays of pointers to @code{mpfr_t}.
 This function is experimental, and does not yet handle intermediate overflows
 and underflows.
+@end deftypefun
+
+@deftypefun int mpfr_legendre (mpfr_t @var{res}, long int @var{n}, const mpfr_t @var{x}, mpfr_rnd_t @var{rnd})
+@var{res} is set with the value of Legendre's polynomial P_@var{n}(@var{x}),
+rounded in the direction of @var{rnd}, where @var{n} stands for the degree of
+the polynomial (@var{n} is assumed to be non-negative).
+If the input variable @var{x} is outside the [-1,1] domain,
+then @var{res} is set to @samp{NaN} and 0 is returned.
+
+Note: it contains an assertion that ensures @var{n} >= 0.
+@end deftypefun
+
+@deftypefun int mpfr_hermite (mpfr_t @var{res}, long int @var{n}, const mpfr_t @var{x}, mpfr_rnd_t @var{rnd})
+@var{res} is set with the value of the (physicist's) Hermite polynomial
+P_@var{n}(@var{x}), rounded in the direction of @var{rnd}, where @var{n}
+stands for the degree of the polynomial. If @var{x} is either @samp{NaN} or
+@samp{+/-Inf}, then @var{res} is set to @samp{NaN} and 0 is returned. If
+@var{x} is large and causes overflow, @var{res} is set to @samp{+/-Inf} with
+the sign of the leading term (2@var{x})^@var{n}.
+
+Note: it contains an assertion that ensures @var{n} >= 0.
 @end deftypefun
 
 For the power functions (with an integer exponent or not), see @ref{mpfr_pow}
@@ -2419,8 +2443,9 @@ rounded in the direction @var{rnd}.
 Set @var{rop} to @m{@var{op1}^{@var{op2}}, @var{op1} raised to @var{op2}},
 rounded in the direction @var{rnd}.
 The @code{mpfr_powr} function corresponds to the @code{powr} function
-from IEEE@tie{}754, i.e., it computes the exponential of
-@var{op2} multiplied by the logarithm of @var{op1}.
+from IEEE@tie{}754, i.e., it is defined as the exponential of
+@var{op2} multiplied by the logarithm of @var{op1},
+with special values handled as described in the IEEE@tie{}754 standard.
 The @code{mpfr_pown} function is just an alias for @code{mpfr_pow_sj}
 (defined with @code{#define mpfr_pown mpfr_pow_sj}), to follow the
 C2x function @code{pown}.
@@ -2446,6 +2471,9 @@ standards for the @code{pow} function:
 Note: When 0 is of integer type, it is regarded as @mm{+}0 by these functions.
 We do not use the usual limit rules in this case, as these rules are not
 used for @code{pow}.
+
+Warning! If @var{y} is an odd integer, @code{pow(-0, @var{y})} has a
+negative sign while @code{powr(-0, @var{y})} has a positive sign.
 @end deftypefun
 
 @deftypefun int mpfr_compound (mpfr_t @var{rop}, const mpfr_t @var{op1}, const mpfr_t @var{op2}, mpfr_rnd_t @var{rnd})
@@ -2733,6 +2761,12 @@ on @var{op}, rounded in the direction @var{rnd}. When @var{op} is NaN,
 @var{rop} is set to @mm{+}0. When @var{op} is zero, and @var{n} is not zero,
 @var{rop} is set to @mm{+}0 or @minus{}0 depending on the parity and sign of
 @var{n}, and the sign of @var{op}.
+
+Note: For @tm{@GMPabs{@var{n}} > 1}, @code{mpfr_jn} might produce an error
+or loop for tiny inputs near the underflow threshold in the internally
+extended exponent range.
+
+These functions are usually denoted by @mm{J_n(x)}.
 @end deftypefun
 
 @deftypefun int mpfr_y0 (mpfr_t @var{rop}, const mpfr_t @var{op}, mpfr_rnd_t @var{rnd})
@@ -2744,6 +2778,11 @@ on @var{op}, rounded in the direction @var{rnd}. When @var{op} is
 NaN or negative, @var{rop} is always set to NaN@. When @var{op} is @mm{+}Inf,
 @var{rop} is set to @mm{+}0. When @var{op} is zero, @var{rop} is set to
 @mm{+}Inf or @minus{}Inf depending on the parity and sign of @var{n}.
+
+These functions are usually denoted by @mm{Y_n(x)} or @mm{N_n(x)}, and also
+called Neumann functions.
+@c Note: The ISO 80000-2:2009 standard uses "Neumann functions" and
+@c prefers the N_n(x) notation.
 @end deftypefun
 
 @deftypefun int mpfr_agm (mpfr_t @var{rop}, const mpfr_t @var{op1}, const mpfr_t @var{op2}, mpfr_rnd_t @var{rnd})
@@ -4607,7 +4646,11 @@ use @code{mpfr_get_z_exp}.
 
 @item @code{mpfr_grandom} in MPFR@tie{}3.1.
 
+@item @code{mpfr_hermite} in MPFR@tie{}4.3.
+
 @item @code{mpfr_j0}, @code{mpfr_j1} and @code{mpfr_jn} in MPFR@tie{}2.3.
+
+@item @code{mpfr_legendre} in MPFR@tie{}4.3.
 
 @item @code{mpfr_log2p1} and @code{mpfr_log10p1} in MPFR@tie{}4.2.
 
@@ -4646,6 +4689,8 @@ use @code{mpfr_get_z_exp}.
 @item @code{mpfr_rootn_si} in MPFR@tie{}4.2.
 
 @item @code{mpfr_rootn_ui} in MPFR@tie{}4.0.
+
+@item @code{mpfr_rsqrt} in MPFR@tie{}4.3.
 
 @item @code{mpfr_set_decimal128} in MPFR@tie{}4.1.
 
@@ -4928,7 +4973,7 @@ some operations are quiet (even on a signaling NaN)@.
 
 The @code{mpfr_rec_sqrt} function differs from IEEE@tie{}754 on @minus{}0,
 where it gives @mm{+}Inf (like for @mm{+}0), following the usual limit rules,
-instead of @minus{}Inf.
+instead of @minus{}Inf. Use instead @code{mpfr_rsqrt} to follow IEEE@tie{}754.
 
 The @code{mpfr_root} function predates IEEE@tie{}754-2008, where rootn was
 introduced, and behaves differently from the IEEE@tie{}754 rootn operation.

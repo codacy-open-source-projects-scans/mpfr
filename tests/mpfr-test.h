@@ -210,6 +210,20 @@ void tests_end_mpfr (void);
 void tests_expect_abort (void);
 int tests_run_within_valgrind (void);
 
+#define IEEE754_SINGLE_PREC  24
+#define IEEE754_DOUBLE_PREC  53
+#define MPFR_PREC_100        100
+#define MPFR_PREC_200        200
+
+#define DUMP_NUMBERS(expected, got)   \
+          do                          \
+            {                         \
+              printf ("expected: ");  \
+              mpfr_dump (expected);   \
+              printf ("got:      ");  \
+              mpfr_dump (got);        \
+            } while (0);
+
 int mpfr_set_machine_rnd_mode (mpfr_rnd_t);
 int have_subnorm_dbl (void);
 int have_subnorm_flt (void);
